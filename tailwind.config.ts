@@ -17,6 +17,13 @@ const config: Config = {
         "colorful-error-extra-color": "#7e2a33",
       },
     },
+    screens: {
+      sm: { max: "640px" },
+      md: { max: "768px" },
+      lg: { max: "1024px" },
+      xl: { max: "1280px" },
+      "2xl": { max: "1536px" },
+    },
   },
   plugins: [],
 };
