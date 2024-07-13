@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { Roboto_Mono } from "next/font/google";
+import { Roboto_Mono, Lexend_Deca } from "next/font/google";
 import "./globals.css";
 
 const robotomono = Roboto_Mono({ subsets: ["latin"] });
+export const lexenddeca = Lexend_Deca({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Monkeytype",
@@ -16,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={robotomono.className}>{children}</body>
+      <body className={`${robotomono.className} bg-bg-color`}>{children}</body>
     </html>
   );
 }
