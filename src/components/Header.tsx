@@ -29,8 +29,11 @@ export default function Header() {
         <div className="flex h-6 gap-2">
           <Image src={logoIcon} alt="Logo Icon" width={40} />
           <h1
-            className={`-mt-4 text-[32px] text-text-color ${lexenddeca.className}`}
+            className={`relative -mt-4 text-[32px] text-text-color ${lexenddeca.className}`}
           >
+            <span className="absolute left-1 top-[2px] text-[.325em] text-sub-color">
+              monkey see
+            </span>
             monkeytype
           </h1>
         </div>
