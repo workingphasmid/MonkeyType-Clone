@@ -15,7 +15,7 @@ type IconType = typeof FaKeyboard;
 
 function HeaderIcon({ Icon }: { Icon: IconType }) {
   return (
-    <div className="p-2 text-sub-color">
+    <div className="p-2 text-sub-color transition-colors hover:text-text-color">
       <Icon size={20} />
     </div>
   );
