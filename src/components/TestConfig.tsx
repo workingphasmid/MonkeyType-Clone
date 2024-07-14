@@ -13,7 +13,7 @@ type IconType = typeof FaAt;
 
 function Button({ Icon, name }: { Icon: IconType; name: string }) {
   return (
-    <button className="flex items-center gap-2">
+    <button className="flex items-center gap-2 transition-colors hover:text-text-color">
       <Icon size={12} />
       <h3 className="text-xs">{name}</h3>
     </button>
@@ -25,7 +25,11 @@ function Separator() {
 }
 
 function Number({ number }: { number: string }) {
-  return <span className="text-xs">{number}</span>;
+  return (
+    <span className="text-xs transition-colors hover:text-text-color">
+      {number}
+    </span>
+  );
 }
 
 export default function TestConfig() {
@@ -49,7 +53,10 @@ export default function TestConfig() {
         <Number number="30" />
         <Number number="60" />
         <Number number="120" />
-        <FaTools size={12} />
+        <FaTools
+          size={12}
+          className="transition-colors hover:text-text-color"
+        />
       </div>
     </div>
   );
