@@ -15,7 +15,7 @@ type IconType = typeof FaKeyboard;
 
 function HeaderIcon({ Icon }: { Icon: IconType }) {
   return (
-    <div className="">
+    <div className="p-2 text-sub-color">
       <Icon size={20} />
     </div>
   );
@@ -23,7 +23,7 @@ function HeaderIcon({ Icon }: { Icon: IconType }) {
 
 export default function Header() {
   return (
-    <header className="flex items-center justify-between">
+    <header className="flex items-center gap-2">
       {/* Left Section */}
       <div className="flex">
         <div className="flex h-6 gap-2">
@@ -34,18 +34,20 @@ export default function Header() {
             monkeytype
           </h1>
         </div>
-        <div className="flex">
+      </div>
+
+      {/* Right Section */}
+      <div className="flex flex-auto justify-between">
+        <div className="flex gap-2">
           <HeaderIcon Icon={FaKeyboard} />
           <HeaderIcon Icon={FaCrown} />
           <HeaderIcon Icon={FaInfo} />
           <HeaderIcon Icon={FaCog} />
         </div>
-      </div>
-
-      {/* Right Section */}
-      <div className="flex">
-        <HeaderIcon Icon={FaBell} />
-        <HeaderIcon Icon={FaRegUser} />
+        <div className="flex gap-2">
+          <HeaderIcon Icon={FaBell} />
+          <HeaderIcon Icon={FaRegUser} />
+        </div>
       </div>
     </header>
   );
