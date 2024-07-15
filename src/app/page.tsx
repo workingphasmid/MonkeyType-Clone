@@ -1,9 +1,11 @@
 import TestConfig from "@/components/TestConfig";
+import TypingArea from "@/components/TypingArea";
 
 export default function Home() {
   return (
-    <main className="mt-8 flex flex-col items-center  text-sub-color">
+    <main className="flex flex-col items-center pt-8 text-sub-color">
       <TestConfig />
+      <TypingArea />
     </main>
   );
 }
