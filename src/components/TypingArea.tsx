@@ -1,5 +1,5 @@
 import { FaGlobeAmericas } from "react-icons/fa";
-
+import { FaRedoAlt } from "react-icons/fa";
 function Language() {
   return (
     <div className="flex items-center gap-4">
@@ -31,6 +31,7 @@ export default function TypingArea() {
     <div className="mt-32 flex flex-col items-center gap-6">
       <Language />
       <ToType />
+      <FaRedoAlt />
     </div>
   );
 }
