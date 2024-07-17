@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${robotomono.className} bg-bg-color py-8 lg:container`}>
+      <body className={`${robotomono.className} bg-bg-color px-16 py-8`}>
         <Header />
         {children}
       </body>
