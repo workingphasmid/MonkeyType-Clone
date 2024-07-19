@@ -1,12 +1,45 @@
+"use client";
+
+import { letters, letterColors as initialLetterColors } from "@/lib/data";
+import { useEffect, useState } from "react";
+
 export default function ToType() {
+  const [index, setIndex] = useState(0);
+  const [letterColors, setLetterColors] = useState(initialLetterColors);
+
+  function handleTyping(event: KeyboardEvent) {
+    if (event.key === letters[index]) {
+      setIndex(index + 1);
+      updateLetterColor(index, "text-text-color");
+    }
+  }
+
+  function updateLetterColor(index: number, color: string) {
+    setLetterColors((prevColors) => {
+      const newColors = [...prevColors];
+      newColors[index] = color;
+      return newColors;
+    });
+  }
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleTyping);
+
+    return () => window.removeEventListener("keydown", handleTyping);
+  }, [index]);
+
   return (
-    <div className="relative px-16 text-2xl">
+    <div className="relative cursor-default px-16 text-2xl">
       <Caret />
-      In physics, power is the amount of energy transferred or converted per
-      unit time. In the International System of Units, the unit of power is the
-      watt, equal to one joule per second. Power is a scalar quantity.
+      {letters.map((letter, i) => (
+        <Letter key={i} letter={letter} color={letterColors[i]} />
+      ))}
     </div>
   );
+}
+
+function Letter({ letter, color }: { letter: string; color: string }) {
+  return <span className={color}>{letter}</span>;
 }
 
 function Caret() {
