@@ -8,15 +8,18 @@ type letterType = { letter: string; color: string };
 export default function ToType() {
   const [index, setIndex] = useState(0);
   const [letterColors, setLetterColors] = useState(initialLetterColors);
-  const [caretPosition, setCaretPosition] = useState("");
+  const [caretPosition, setCaretPosition] = useState(0);
 
-  const letterRef = useRef(null);
-  console.log(letterRef.current);
+  const letterRef = useRef<HTMLSpanElement>(null);
 
   function handleTyping(event: KeyboardEvent) {
     if (event.key === letters[index]) {
       setIndex(index + 1);
       updateLetterColor(index, "text-text-color");
+      letterRef.current != null &&
+        setCaretPosition(
+          caretPosition + letterRef.current.getBoundingClientRect().width,
+        );
     }
   }
 
@@ -35,7 +38,7 @@ export default function ToType() {
   }, [index]);
 
   return (
-    <div className="relative cursor-default px-16 text-2xl">
+    <div className="relative cursor-default text-2xl">
       <Caret caretPosition={caretPosition} />
       {letters.map((letter, i) => (
         <Letter
@@ -59,10 +62,11 @@ const Letter = forwardRef<HTMLSpanElement, letterType>(
   },
 );
 
-function Caret({ caretPosition }: { caretPosition: string }) {
+function Caret({ caretPosition }: { caretPosition: number }) {
   return (
     <div
-      className={`absolute h-8 w-[.1em] left-[${caretPosition}] animate-pulse bg-caret-color`}
+      className="absolute left-0 top-0 h-8 w-[.1em] animate-pulse bg-caret-color"
+      style={{ left: caretPosition + "px" }}
     ></div>
   );
 }
