@@ -1,11 +1,17 @@
 "use client";
 
 import { letters, letterColors as initialLetterColors } from "@/lib/data";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
+
+type letterType = { letter: string; color: string };
 
 export default function ToType() {
   const [index, setIndex] = useState(0);
   const [letterColors, setLetterColors] = useState(initialLetterColors);
+  const [caretPosition, setCaretPosition] = useState("");
+
+  const letterRef = useRef(null);
+  console.log(letterRef.current);
 
   function handleTyping(event: KeyboardEvent) {
     if (event.key === letters[index]) {
@@ -30,20 +36,33 @@ export default function ToType() {
 
   return (
     <div className="relative cursor-default px-16 text-2xl">
-      <Caret />
+      <Caret caretPosition={caretPosition} />
       {letters.map((letter, i) => (
-        <Letter key={i} letter={letter} color={letterColors[i]} />
+        <Letter
+          key={i}
+          letter={letter}
+          color={letterColors[i]}
+          ref={i === index ? letterRef : null}
+        />
       ))}
     </div>
   );
 }
 
-function Letter({ letter, color }: { letter: string; color: string }) {
-  return <span className={color}>{letter}</span>;
-}
+const Letter = forwardRef<HTMLSpanElement, letterType>(
+  ({ letter, color }, ref) => {
+    return (
+      <span ref={ref} className={color}>
+        {letter}
+      </span>
+    );
+  },
+);
 
-function Caret() {
+function Caret({ caretPosition }: { caretPosition: string }) {
   return (
-    <div className="absolute h-8 w-[.1em] animate-pulse bg-caret-color"></div>
+    <div
+      className={`absolute h-8 w-[.1em] left-[${caretPosition}] animate-pulse bg-caret-color`}
+    ></div>
   );
 }
