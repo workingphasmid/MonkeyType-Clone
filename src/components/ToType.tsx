@@ -16,10 +16,14 @@ export default function ToType() {
     if (event.key === letters[index]) {
       setIndex(index + 1);
       updateLetterColor(index, "text-text-color");
-      letterRef.current != null &&
-        setCaretPosition(
-          caretPosition + letterRef.current.getBoundingClientRect().width,
-        );
+
+      // Updating the caret position
+      if (letterRef.current) {
+        const currentLetterWidth =
+          letterRef.current.getBoundingClientRect().width;
+
+        setCaretPosition(caretPosition + currentLetterWidth);
+      }
     }
   }
 
@@ -31,6 +35,7 @@ export default function ToType() {
     });
   }
 
+  // Initial Event for Keydown (typing) to Window
   useEffect(() => {
     window.addEventListener("keydown", handleTyping);
 
