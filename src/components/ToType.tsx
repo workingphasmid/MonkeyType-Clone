@@ -4,11 +4,12 @@ import { letters, letterColors as initialLetterColors } from "@/lib/data";
 import { forwardRef, useEffect, useRef, useState } from "react";
 
 type letterType = { letter: string; color: string };
+type caretPositionType = { top: number; left: number };
 
 export default function ToType() {
   const [index, setIndex] = useState(0);
   const [letterColors, setLetterColors] = useState(initialLetterColors);
-  const [caretPosition, setCaretPosition] = useState(0);
+  const [caretPosition, setCaretPosition] = useState({ top: 0, left: 0 });
 
   const letterRef = useRef<HTMLSpanElement>(null);
 
@@ -19,10 +20,18 @@ export default function ToType() {
 
       // Updating the caret position
       if (letterRef.current) {
-        const currentLetterWidth =
-          letterRef.current.getBoundingClientRect().width;
+        const currentLetter = letterRef.current?.getBoundingClientRect();
+        const currentLetterWidth = currentLetter.width;
+        const currentLetterTop = letterRef.current.offsetTop;
 
-        setCaretPosition(caretPosition + currentLetterWidth);
+        if (currentLetterTop !== caretPosition.top) {
+          setCaretPosition({ top: currentLetterTop, left: 0 });
+        } else {
+          setCaretPosition({
+            ...caretPosition,
+            left: caretPosition.left + currentLetterWidth,
+          });
+        }
       }
     }
   }
@@ -67,11 +76,11 @@ const Letter = forwardRef<HTMLSpanElement, letterType>(
   },
 );
 
-function Caret({ caretPosition }: { caretPosition: number }) {
+function Caret({ caretPosition }: { caretPosition: caretPositionType }) {
   return (
     <div
       className="absolute left-0 top-0 h-8 w-[.1em] animate-pulse bg-caret-color"
-      style={{ left: caretPosition + "px" }}
+      style={{ top: caretPosition.top + "px", left: caretPosition.left + "px" }}
     ></div>
   );
 }
