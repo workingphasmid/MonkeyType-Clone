@@ -22,17 +22,38 @@ export default function ToType() {
   }, [index]);
 
   function handleTyping(event: KeyboardEvent) {
+    const isValidKey = /^[a-zA-Z0-9 .,?!;:']$/.test(event.key);
+
+    if (!isValidKey) return;
+
+    setIndex(index + 1);
+    updateCaretPosition();
+    setIsTyping(true);
+
     if (event.key === letters[index]) {
       isCorrect();
+    } else {
+      isWrong();
     }
   }
 
   function isCorrect() {
-    setIndex(index + 1);
     updateLetterColor(index, "text-text-color");
-    setIsTyping(true);
+  }
 
-    // Updating the caret position
+  function isWrong() {
+    updateLetterColor(index, "text-error-color");
+  }
+
+  function updateLetterColor(index: number, color: string) {
+    setLetterColors((prevColors) => {
+      const newColors = [...prevColors];
+      newColors[index] = color;
+      return newColors;
+    });
+  }
+
+  function updateCaretPosition() {
     if (letterRef.current) {
       const currentLetterRect = letterRef.current?.getBoundingClientRect();
       const currentLetterWidth = currentLetterRect.width;
@@ -50,14 +71,6 @@ export default function ToType() {
         });
       }
     }
-  }
-
-  function updateLetterColor(index: number, color: string) {
-    setLetterColors((prevColors) => {
-      const newColors = [...prevColors];
-      newColors[index] = color;
-      return newColors;
-    });
   }
 
   return (
