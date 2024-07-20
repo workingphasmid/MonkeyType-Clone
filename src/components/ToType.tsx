@@ -14,29 +14,40 @@ export default function ToType() {
 
   const letterRef = useRef<HTMLSpanElement>(null);
 
+  // Initial Event for Keydown (typing) to Window
+  useEffect(() => {
+    window.addEventListener("keydown", handleTyping);
+
+    return () => window.removeEventListener("keydown", handleTyping);
+  }, [index]);
+
   function handleTyping(event: KeyboardEvent) {
     if (event.key === letters[index]) {
-      setIndex(index + 1);
-      updateLetterColor(index, "text-text-color");
-      setIsTyping(true);
+      isCorrect();
+    }
+  }
 
-      // Updating the caret position
-      if (letterRef.current) {
-        const currentLetterRect = letterRef.current?.getBoundingClientRect();
-        const currentLetterWidth = currentLetterRect.width;
-        const currentLetterheight = currentLetterRect.height;
+  function isCorrect() {
+    setIndex(index + 1);
+    updateLetterColor(index, "text-text-color");
+    setIsTyping(true);
 
-        if (currentLetterWidth === 0) {
-          setCaretPosition({
-            left: 0,
-            top: caretPosition.top + currentLetterheight,
-          });
-        } else {
-          setCaretPosition({
-            ...caretPosition,
-            left: caretPosition.left + currentLetterWidth,
-          });
-        }
+    // Updating the caret position
+    if (letterRef.current) {
+      const currentLetterRect = letterRef.current?.getBoundingClientRect();
+      const currentLetterWidth = currentLetterRect.width;
+      const currentLetterheight = currentLetterRect.height;
+
+      if (currentLetterWidth === 0) {
+        setCaretPosition({
+          left: 0,
+          top: caretPosition.top + currentLetterheight,
+        });
+      } else {
+        setCaretPosition({
+          ...caretPosition,
+          left: caretPosition.left + currentLetterWidth,
+        });
       }
     }
   }
@@ -48,13 +59,6 @@ export default function ToType() {
       return newColors;
     });
   }
-
-  // Initial Event for Keydown (typing) to Window
-  useEffect(() => {
-    window.addEventListener("keydown", handleTyping);
-
-    return () => window.removeEventListener("keydown", handleTyping);
-  }, [index]);
 
   return (
     <div className="relative cursor-default text-2xl">
