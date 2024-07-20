@@ -10,6 +10,7 @@ export default function ToType() {
   const [index, setIndex] = useState(0);
   const [letterColors, setLetterColors] = useState(initialLetterColors);
   const [caretPosition, setCaretPosition] = useState({ top: 0, left: 0 });
+  const [isTyping, setIsTyping] = useState(false);
 
   const letterRef = useRef<HTMLSpanElement>(null);
 
@@ -17,6 +18,7 @@ export default function ToType() {
     if (event.key === letters[index]) {
       setIndex(index + 1);
       updateLetterColor(index, "text-text-color");
+      setIsTyping(true);
 
       // Updating the caret position
       if (letterRef.current) {
@@ -25,7 +27,10 @@ export default function ToType() {
         const currentLetterheight = currentLetterRect.height;
 
         if (currentLetterWidth === 0) {
-          setCaretPosition({ left: 0, top: currentLetterheight });
+          setCaretPosition({
+            left: 0,
+            top: caretPosition.top + currentLetterheight,
+          });
         } else {
           setCaretPosition({
             ...caretPosition,
@@ -53,7 +58,7 @@ export default function ToType() {
 
   return (
     <div className="relative cursor-default text-2xl">
-      <Caret caretPosition={caretPosition} />
+      <Caret caretPosition={caretPosition} isTyping={isTyping} />
       {letters.map((letter, i) => (
         <Letter
           key={i}
@@ -76,11 +81,27 @@ const Letter = forwardRef<HTMLSpanElement, letterType>(
   },
 );
 
-function Caret({ caretPosition }: { caretPosition: caretPositionType }) {
+function Caret({
+  caretPosition,
+  isTyping,
+}: {
+  caretPosition: caretPositionType;
+  isTyping: boolean;
+}) {
+  const caretStyle = {
+    top: Math.round(caretPosition.top) + "px",
+    left: Math.round(caretPosition.left) + "px",
+    animation: "pulse 1s ease-in-out infinite",
+  };
+
+  if (isTyping) {
+    caretStyle.animation = "";
+  }
+
   return (
     <div
-      className="absolute left-0 top-0 h-8 w-[.1em] animate-pulse bg-caret-color"
-      style={{ top: caretPosition.top + "px", left: caretPosition.left + "px" }}
+      className="absolute left-0 top-0 h-8 w-[.1em] bg-caret-color transition-all duration-75"
+      style={caretStyle}
     ></div>
   );
 }
