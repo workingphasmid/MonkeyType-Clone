@@ -20,12 +20,12 @@ export default function ToType() {
 
       // Updating the caret position
       if (letterRef.current) {
-        const currentLetter = letterRef.current?.getBoundingClientRect();
-        const currentLetterWidth = currentLetter.width;
-        const currentLetterTop = letterRef.current.offsetTop;
+        const currentLetterRect = letterRef.current?.getBoundingClientRect();
+        const currentLetterWidth = currentLetterRect.width;
+        const currentLetterheight = currentLetterRect.height;
 
-        if (currentLetterTop !== caretPosition.top) {
-          setCaretPosition({ top: currentLetterTop, left: 0 });
+        if (currentLetterWidth === 0) {
+          setCaretPosition({ left: 0, top: currentLetterheight });
         } else {
           setCaretPosition({
             ...caretPosition,
