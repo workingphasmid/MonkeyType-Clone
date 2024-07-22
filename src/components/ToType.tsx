@@ -7,7 +7,7 @@ type WordType = {
   word: string;
   wordIndex: number;
   currentWordIndex: number;
-  setCurrentWordIndex: any;
+  updateCurrentWord: any;
   ref: React.RefObject<HTMLDivElement>;
 };
 
@@ -16,7 +16,11 @@ export default function ToType() {
 
   const currentWordRef = useRef<HTMLDivElement>(null);
 
-  console.log(currentWordRef.current);
+  function updateCurrentWord() {
+    setCurrentWordIndex(currentWordIndex + 1);
+    currentWordRef.current?.focus();
+  }
+
   return (
     <div className="relative px-16 text-2xl">
       <Caret />
@@ -26,7 +30,7 @@ export default function ToType() {
           word={word}
           wordIndex={i}
           currentWordIndex={currentWordIndex}
-          setCurrentWordIndex={setCurrentWordIndex}
+          updateCurrentWord={updateCurrentWord}
           ref={currentWordRef}
         />
       ))}
@@ -35,14 +39,14 @@ export default function ToType() {
 }
 
 const Word = forwardRef<HTMLDivElement, WordType>(
-  ({ word, wordIndex, currentWordIndex, setCurrentWordIndex }, ref) => {
+  ({ word, wordIndex, currentWordIndex, updateCurrentWord }, ref) => {
     const [letterIndex, setLetterIndex] = useState(0);
 
     const letters = word.split("");
 
     function handleKeydown(e: any) {
       if (word.length === letterIndex + 1) {
-        setCurrentWordIndex(currentWordIndex + 1);
+        updateCurrentWord();
         setLetterIndex(0);
       } else {
         setLetterIndex(letterIndex + 1);
