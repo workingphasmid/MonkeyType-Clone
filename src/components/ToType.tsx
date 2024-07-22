@@ -52,25 +52,27 @@ const Word = forwardRef<HTMLDivElement, WordType>(
         return;
       }
 
-      if (pressedKey === "Backspace") {
-        updateLetters(pressedKey, "delete");
-        return;
-      }
-
       // Updating the word and letter indexes
-      if (!atEnd) {
+      if (pressedKey === "Backspace") {
+        deleteLetter(pressedKey);
+      } else if (!atEnd) {
         setLetterIndex(letterIndex + 1);
-        return;
-      }
-
-      if (pressedKey !== " ") {
-        updateLetters(pressedKey, "add");
       } else if (pressedKey === " ") {
         updateCurrentWord(e);
+      } else if (pressedKey !== " ") {
+        updateLetters(pressedKey, "add");
       }
     }
 
     // Supporting functions
+    function deleteLetter(pressedKey: string) {
+      if (word.length < letterIndex) {
+        updateLetters(pressedKey, "delete");
+      } else if (letterIndex > 0) {
+        setLetterIndex(letterIndex - 1);
+      }
+    }
+
     function updateLetters(pressedKey: string, mode: string) {
       const newLetters = [...letters];
 
@@ -98,6 +100,8 @@ const Word = forwardRef<HTMLDivElement, WordType>(
         {letters.map((letter, i) => (
           <span key={i}>{letter}</span>
         ))}
+        {letterIndex}
+        {letters.length}
       </div>
     );
   },
