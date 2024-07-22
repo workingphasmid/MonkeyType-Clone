@@ -146,9 +146,6 @@ const Word = forwardRef<HTMLDivElement, WordType>(
 
 function Caret() {
   return (
-    <div
-      className="absolute left-0 top-0 h-8 w-[.1em] bg-caret-color transition-all duration-75"
-      style={caretStyle}
-    ></div>
+    <div className="absolute left-0 top-0 h-8 w-[.1em] bg-caret-color transition-all duration-75"></div>
   );
 }
