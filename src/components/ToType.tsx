@@ -1,7 +1,7 @@
 "use client";
 
 import { words } from "@/lib/data";
-import { forwardRef, useRef, useState } from "react";
+import { forwardRef, useRef, useState, KeyboardEvent } from "react";
 
 type WordType = {
   word: string;
@@ -12,11 +12,10 @@ type WordType = {
 };
 
 export default function ToType() {
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-
+  const [currentWordIndex, setCurrentWordIndex] = useState(1);
   const currentWordRef = useRef<HTMLDivElement>(null);
 
-  function updateCurrentWord() {
+  function updateCurrentWord(e: KeyboardEvent) {
     setCurrentWordIndex(currentWordIndex + 1);
     currentWordRef.current?.focus();
   }
@@ -41,15 +40,22 @@ export default function ToType() {
 const Word = forwardRef<HTMLDivElement, WordType>(
   ({ word, wordIndex, currentWordIndex, updateCurrentWord }, ref) => {
     const [letterIndex, setLetterIndex] = useState(0);
+    const [letters, setLetters] = useState(word.split(""));
 
-    const letters = word.split("");
-
-    function handleKeydown(e: any) {
-      if (word.length === letterIndex + 1) {
-        updateCurrentWord();
-        setLetterIndex(0);
-      } else {
+    function handleKeydown(e: KeyboardEvent) {
+      if (letters.length !== letterIndex) {
         setLetterIndex(letterIndex + 1);
+        return;
+      }
+
+      if (e.key !== " ") {
+        const newLetters = [...letters];
+        newLetters[letterIndex] = e.key;
+
+        setLetterIndex(letterIndex + 1);
+        setLetters(newLetters);
+      } else if (e.key === " ") {
+        updateCurrentWord(e);
       }
     }
 
@@ -58,13 +64,12 @@ const Word = forwardRef<HTMLDivElement, WordType>(
         className="mx-2 inline-block"
         tabIndex={0}
         autoFocus={true}
-        onKeyDown={handleKeydown}
+        onKeyDown={(e) => handleKeydown(e)}
         ref={currentWordIndex === wordIndex ? ref : null}
       >
         {letters.map((letter, i) => (
           <span key={i}>{letter}</span>
         ))}
-        {letterIndex}
       </div>
     );
   },
