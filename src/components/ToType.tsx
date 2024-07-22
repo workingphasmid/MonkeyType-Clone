@@ -55,10 +55,10 @@ const Word = forwardRef<HTMLDivElement, WordType>(
       // Updating the word and letter indexes
       if (pressedKey === "Backspace") {
         deleteLetter(pressedKey);
-      } else if (!atEnd) {
-        setLetterIndex(letterIndex + 1);
-      } else if (pressedKey === " ") {
+      } else if (pressedKey === " " && letterIndex !== 0) {
         updateCurrentWord(e);
+      } else if (!atEnd && pressedKey !== " ") {
+        setLetterIndex(letterIndex + 1);
       } else if (pressedKey !== " ") {
         updateLetters(pressedKey, "add");
       }
