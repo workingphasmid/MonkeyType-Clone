@@ -1,6 +1,7 @@
 "use client";
 
 import { words } from "@/lib/data";
+import { useRef, useState } from "react";
 
 type WordType = { word: string };
 
@@ -16,13 +17,28 @@ export default function ToType() {
 }
 
 function Word({ word }: WordType) {
+  const [letterIndex, setLetterIndex] = useState(0);
+  const currentLetterRef = useRef<HTMLSpanElement>(null);
+
   const letters = word.split("");
 
+  function handleKeydown(e: any) {
+    setLetterIndex(letterIndex + 1);
+  }
+
   return (
-    <div className="mx-2 inline-block">
+    <div
+      className="mx-2 inline-block"
+      tabIndex={0}
+      autoFocus={true}
+      onKeyDown={handleKeydown}
+    >
       {letters.map((letter, i) => (
-        <span key={i}>{letter}</span>
+        <span key={i} ref={letterIndex === i ? currentLetterRef : null}>
+          {letter}
+        </span>
       ))}
+      {letterIndex}
     </div>
   );
 }
