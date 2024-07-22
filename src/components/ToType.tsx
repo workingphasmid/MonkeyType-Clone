@@ -46,6 +46,11 @@ const Word = forwardRef<HTMLDivElement, WordType>(
       const atEnd = letters.length === letterIndex;
       const pressedKey = e.key;
 
+      // Wall: Ending the key if its not valid
+      if (!/^[\s\w'",.?!;:@#$%&()]$/.test(pressedKey)) {
+        return;
+      }
+
       if (!atEnd) {
         setLetterIndex(letterIndex + 1);
         return;
