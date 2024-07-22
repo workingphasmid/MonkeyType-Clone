@@ -41,6 +41,7 @@ const Word = forwardRef<HTMLDivElement, WordType>(
   ({ word, wordIndex, currentWordIndex, updateCurrentWord }, ref) => {
     const [letterIndex, setLetterIndex] = useState(0);
     const [letters, setLetters] = useState(word.split(""));
+    const [lettersColor, setLettersColor] = useState(Array<string>);
 
     function handleKeydown(e: KeyboardEvent) {
       const atEnd = letters.length === letterIndex;
@@ -64,6 +65,16 @@ const Word = forwardRef<HTMLDivElement, WordType>(
         setLetterIndex(letterIndex + 1);
       } else if (!isSpace) {
         updateLetters(pressedKey, "add");
+      }
+
+      // Checking if right or wrong
+      const currentLetter = letters[letterIndex];
+
+      if (currentLetter === pressedKey) {
+        const newLettersColor = [...lettersColor];
+        newLettersColor[letterIndex] = "text-text-color";
+
+        setLettersColor(newLettersColor);
       }
     }
 
@@ -101,7 +112,9 @@ const Word = forwardRef<HTMLDivElement, WordType>(
         ref={currentWordIndex === wordIndex ? ref : null}
       >
         {letters.map((letter, i) => (
-          <span key={i}>{letter}</span>
+          <span key={i} className={lettersColor[i]}>
+            {letter}
+          </span>
         ))}
         {letterIndex}
         {letters.length}
