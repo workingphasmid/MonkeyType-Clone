@@ -43,18 +43,21 @@ const Word = forwardRef<HTMLDivElement, WordType>(
     const [letters, setLetters] = useState(word.split(""));
 
     function handleKeydown(e: KeyboardEvent) {
-      if (letters.length !== letterIndex) {
+      const atEnd = letters.length === letterIndex;
+      const pressedKey = e.key;
+
+      if (!atEnd) {
         setLetterIndex(letterIndex + 1);
         return;
       }
 
-      if (e.key !== " ") {
+      if (pressedKey !== " ") {
         const newLetters = [...letters];
-        newLetters[letterIndex] = e.key;
+        newLetters[letterIndex] = pressedKey;
 
         setLetterIndex(letterIndex + 1);
         setLetters(newLetters);
-      } else if (e.key === " ") {
+      } else if (pressedKey === " ") {
         updateCurrentWord(e);
       }
     }
