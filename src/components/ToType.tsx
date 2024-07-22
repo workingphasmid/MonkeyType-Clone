@@ -71,10 +71,9 @@ const Word = forwardRef<HTMLDivElement, WordType>(
       const currentLetter = letters[letterIndex];
 
       if (currentLetter === pressedKey) {
-        const newLettersColor = [...lettersColor];
-        newLettersColor[letterIndex] = "text-text-color";
-
-        setLettersColor(newLettersColor);
+        updateLettersColor("correct");
+      } else {
+        updateLettersColor("wrong");
       }
     }
 
@@ -101,6 +100,18 @@ const Word = forwardRef<HTMLDivElement, WordType>(
       }
 
       setLetters(newLetters);
+    }
+
+    function updateLettersColor(mode: string) {
+      const newLettersColor = [...lettersColor];
+
+      if (mode === "correct") {
+        newLettersColor[letterIndex] = "text-text-color";
+      } else if (mode === "wrong") {
+        newLettersColor[letterIndex] = "text-error-color";
+      }
+
+      setLettersColor(newLettersColor);
     }
 
     return (
