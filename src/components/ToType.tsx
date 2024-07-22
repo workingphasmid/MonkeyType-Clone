@@ -59,20 +59,14 @@ const Word = forwardRef<HTMLDivElement, WordType>(
 
       if (pressedKey === "Backspace") {
         deleteLetter(pressedKey);
+        // updateLettersColor("default");
       } else if (isSpace && !isFirstLetter) {
         updateCurrentWord(e);
       } else if (!atEnd && !isSpace) {
         setLetterIndex(letterIndex + 1);
+        checkLetter(pressedKey);
       } else if (!isSpace) {
         updateLetters(pressedKey, "add");
-      }
-
-      // Checking if right or wrong
-      const currentLetter = letters[letterIndex];
-
-      if (currentLetter === pressedKey) {
-        updateLettersColor("correct");
-      } else {
         updateLettersColor("wrong");
       }
     }
@@ -84,6 +78,11 @@ const Word = forwardRef<HTMLDivElement, WordType>(
       } else if (letterIndex > 0) {
         setLetterIndex(letterIndex - 1);
       }
+
+      const newLettersColor = [...lettersColor];
+      newLettersColor.pop();
+
+      setLettersColor(newLettersColor);
     }
 
     function updateLetters(pressedKey: string, mode: string) {
@@ -109,9 +108,21 @@ const Word = forwardRef<HTMLDivElement, WordType>(
         newLettersColor[letterIndex] = "text-text-color";
       } else if (mode === "wrong") {
         newLettersColor[letterIndex] = "text-error-color";
+      } else if (mode === "default") {
+        newLettersColor[letterIndex] = "text-sub-color";
       }
 
       setLettersColor(newLettersColor);
+    }
+
+    function checkLetter(pressedKey: string) {
+      const currentLetter = letters[letterIndex];
+
+      if (currentLetter === pressedKey) {
+        updateLettersColor("correct");
+      } else {
+        updateLettersColor("wrong");
+      }
     }
 
     return (
