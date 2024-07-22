@@ -53,13 +53,16 @@ const Word = forwardRef<HTMLDivElement, WordType>(
       }
 
       // Updating the word and letter indexes
+      const isFirstLetter = letterIndex === 0;
+      const isSpace = pressedKey === " ";
+
       if (pressedKey === "Backspace") {
         deleteLetter(pressedKey);
-      } else if (pressedKey === " " && letterIndex !== 0) {
+      } else if (isSpace && !isFirstLetter) {
         updateCurrentWord(e);
-      } else if (!atEnd && pressedKey !== " ") {
+      } else if (!atEnd && !isSpace) {
         setLetterIndex(letterIndex + 1);
-      } else if (pressedKey !== " ") {
+      } else if (!isSpace) {
         updateLetters(pressedKey, "add");
       }
     }
