@@ -1,120 +1,150 @@
 "use client";
 
-import { letters, letterColors as initialLetterColors } from "@/lib/data";
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { words } from "@/lib/data";
+import { forwardRef, useRef, useState, KeyboardEvent } from "react";
 
-type letterType = { letter: string; color: string };
-type caretPositionType = { top: number; left: number };
+type WordType = {
+  word: string;
+  wordIndex: number;
+  currentWordIndex: number;
+  updateCurrentWord: any;
+  ref: React.RefObject<HTMLDivElement>;
+};
 
 export default function ToType() {
-  const [index, setIndex] = useState(0);
-  const [letterColors, setLetterColors] = useState(initialLetterColors);
-  const [caretPosition, setCaretPosition] = useState({ top: 0, left: 0 });
-  const [isTyping, setIsTyping] = useState(false);
+  const [currentWordIndex, setCurrentWordIndex] = useState(1);
+  const currentWordRef = useRef<HTMLDivElement>(null);
 
-  const letterRef = useRef<HTMLSpanElement>(null);
-
-  // Initial Event for Keydown (typing) to Window
-  useEffect(() => {
-    window.addEventListener("keydown", handleTyping);
-
-    return () => window.removeEventListener("keydown", handleTyping);
-  }, [index]);
-
-  function handleTyping(event: KeyboardEvent) {
-    const isValidKey = /^[a-zA-Z0-9 .,?!;:']$/.test(event.key);
-
-    if (!isValidKey) return;
-
-    setIndex(index + 1);
-    updateCaretPosition();
-    setIsTyping(true);
-
-    if (event.key === letters[index]) {
-      isCorrect();
-    } else {
-      isWrong();
-    }
-  }
-
-  function isCorrect() {
-    updateLetterColor(index, "text-text-color");
-  }
-
-  function isWrong() {
-    updateLetterColor(index, "text-error-color");
-  }
-
-  function updateLetterColor(index: number, color: string) {
-    setLetterColors((prevColors) => {
-      const newColors = [...prevColors];
-      newColors[index] = color;
-      return newColors;
-    });
-  }
-
-  function updateCaretPosition() {
-    if (letterRef.current) {
-      const currentLetterRect = letterRef.current?.getBoundingClientRect();
-      const currentLetterWidth = currentLetterRect.width;
-      const currentLetterheight = currentLetterRect.height;
-
-      if (currentLetterWidth === 0) {
-        setCaretPosition({
-          left: 0,
-          top: caretPosition.top + currentLetterheight,
-        });
-      } else {
-        setCaretPosition({
-          ...caretPosition,
-          left: caretPosition.left + currentLetterWidth,
-        });
-      }
-    }
+  function updateCurrentWord(e: KeyboardEvent) {
+    setCurrentWordIndex(currentWordIndex + 1);
+    currentWordRef.current?.focus();
   }
 
   return (
-    <div className="relative cursor-default text-2xl">
-      <Caret caretPosition={caretPosition} isTyping={isTyping} />
-      {letters.map((letter, i) => (
-        <Letter
+    <div className="relative px-16 text-2xl">
+      <Caret />
+      {words.map((word, i) => (
+        <Word
           key={i}
-          letter={letter}
-          color={letterColors[i]}
-          ref={i === index ? letterRef : null}
+          word={word}
+          wordIndex={i}
+          currentWordIndex={currentWordIndex}
+          updateCurrentWord={updateCurrentWord}
+          ref={currentWordRef}
         />
       ))}
     </div>
   );
 }
 
-const Letter = forwardRef<HTMLSpanElement, letterType>(
-  ({ letter, color }, ref) => {
+const Word = forwardRef<HTMLDivElement, WordType>(
+  ({ word, wordIndex, currentWordIndex, updateCurrentWord }, ref) => {
+    const [letterIndex, setLetterIndex] = useState(0);
+    const [letters, setLetters] = useState(word.split(""));
+    const [lettersColor, setLettersColor] = useState(Array<string>);
+
+    function handleKeydown(e: KeyboardEvent) {
+      const atEnd = letters.length === letterIndex;
+      const pressedKey = e.key;
+      const pattern = /^[\s\w'",.?!;:@#$%&()]$/;
+
+      // Wall: Ending the key if its not valid
+      if (!pattern.test(pressedKey) && pressedKey !== "Backspace") {
+        return;
+      }
+
+      // Updating the word and letter indexes
+      const isFirstLetter = letterIndex === 0;
+      const isSpace = pressedKey === " ";
+
+      if (pressedKey === "Backspace") {
+        deleteLetter(pressedKey);
+        // updateLettersColor("default");
+      } else if (isSpace && !isFirstLetter) {
+        updateCurrentWord(e);
+      } else if (!atEnd && !isSpace) {
+        setLetterIndex(letterIndex + 1);
+        checkLetter(pressedKey);
+      } else if (!isSpace) {
+        updateLetters(pressedKey, "add");
+        updateLettersColor("wrong");
+      }
+    }
+
+    // Supporting functions
+    function deleteLetter(pressedKey: string) {
+      if (word.length < letterIndex) {
+        updateLetters(pressedKey, "delete");
+      } else if (letterIndex > 0) {
+        setLetterIndex(letterIndex - 1);
+      }
+
+      const newLettersColor = [...lettersColor];
+      newLettersColor.pop();
+
+      setLettersColor(newLettersColor);
+    }
+
+    function updateLetters(pressedKey: string, mode: string) {
+      const newLetters = [...letters];
+
+      if (mode === "delete") {
+        newLetters.pop();
+
+        setLetterIndex(letterIndex - 1);
+      } else if (mode === "add") {
+        newLetters[letterIndex] = pressedKey;
+
+        setLetterIndex(letterIndex + 1);
+      }
+
+      setLetters(newLetters);
+    }
+
+    function updateLettersColor(mode: string) {
+      const newLettersColor = [...lettersColor];
+
+      if (mode === "correct") {
+        newLettersColor[letterIndex] = "text-text-color";
+      } else if (mode === "wrong") {
+        newLettersColor[letterIndex] = "text-error-color";
+      } else if (mode === "default") {
+        newLettersColor[letterIndex] = "text-sub-color";
+      }
+
+      setLettersColor(newLettersColor);
+    }
+
+    function checkLetter(pressedKey: string) {
+      const currentLetter = letters[letterIndex];
+
+      if (currentLetter === pressedKey) {
+        updateLettersColor("correct");
+      } else {
+        updateLettersColor("wrong");
+      }
+    }
+
+    const isAutoFocus = wordIndex === 0;
     return (
-      <span ref={ref} className={color}>
-        {letter}
-      </span>
+      <div
+        className="mx-2 inline-block outline-none"
+        onKeyDown={(e) => handleKeydown(e)}
+        ref={currentWordIndex === wordIndex ? ref : null}
+        tabIndex={0}
+        autoFocus={isAutoFocus}
+      >
+        {letters.map((letter, i) => (
+          <span key={i} className={lettersColor[i]}>
+            {letter}
+          </span>
+        ))}
+      </div>
     );
   },
 );
 
-function Caret({
-  caretPosition,
-  isTyping,
-}: {
-  caretPosition: caretPositionType;
-  isTyping: boolean;
-}) {
-  const caretStyle = {
-    top: Math.round(caretPosition.top) + "px",
-    left: Math.round(caretPosition.left) + "px",
-    animation: "pulse 1s ease-in-out infinite",
-  };
-
-  if (isTyping) {
-    caretStyle.animation = "";
-  }
-
+function Caret() {
   return (
     <div
       className="absolute left-0 top-0 h-8 w-[.1em] bg-caret-color transition-all duration-75"
