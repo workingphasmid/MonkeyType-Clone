@@ -45,26 +45,46 @@ const Word = forwardRef<HTMLDivElement, WordType>(
     function handleKeydown(e: KeyboardEvent) {
       const atEnd = letters.length === letterIndex;
       const pressedKey = e.key;
+      const pattern = /^[\s\w'",.?!;:@#$%&()]$/;
 
       // Wall: Ending the key if its not valid
-      if (!/^[\s\w'",.?!;:@#$%&()]$/.test(pressedKey)) {
+      if (!pattern.test(pressedKey) && pressedKey !== "Backspace") {
         return;
       }
 
+      if (pressedKey === "Backspace") {
+        updateLetters(pressedKey, "delete");
+        return;
+      }
+
+      // Updating the word and letter indexes
       if (!atEnd) {
         setLetterIndex(letterIndex + 1);
         return;
       }
 
       if (pressedKey !== " ") {
-        const newLetters = [...letters];
-        newLetters[letterIndex] = pressedKey;
-
-        setLetterIndex(letterIndex + 1);
-        setLetters(newLetters);
+        updateLetters(pressedKey, "add");
       } else if (pressedKey === " ") {
         updateCurrentWord(e);
       }
+    }
+
+    // Supporting functions
+    function updateLetters(pressedKey: string, mode: string) {
+      const newLetters = [...letters];
+
+      if (mode === "delete") {
+        newLetters.pop();
+
+        setLetterIndex(letterIndex - 1);
+      } else if (mode === "add") {
+        newLetters[letterIndex] = pressedKey;
+
+        setLetterIndex(letterIndex + 1);
+      }
+
+      setLetters(newLetters);
     }
 
     return (
