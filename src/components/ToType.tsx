@@ -31,8 +31,12 @@ export default function ToType() {
   }
 
   function updateCaretPosition(letterRef: HTMLSpanElement, mode: string) {
-    const letterWidth = Math.round(letterRef?.getBoundingClientRect().width);
-    const letterHeight = Math.round(letterRef?.getBoundingClientRect().height);
+    const letterWidth = Number(
+      letterRef?.getBoundingClientRect().width.toFixed(2),
+    );
+    const letterHeight = Number(
+      letterRef?.getBoundingClientRect().height.toFixed(2),
+    );
 
     if (mode === "add") {
       setCaretPosition({
@@ -100,16 +104,18 @@ const Word = forwardRef<HTMLDivElement, WordType>(
       if (pressedKey === "Backspace") {
         if (isFirstLetter && !isFirstWord) {
           updateCurrentWord("minus");
-        } else {
-          deleteLetter(pressedKey);
         }
+
+        updateCaretPosition(letterRef.current, "minus");
+        deleteLetter(pressedKey);
       } else if (isSpace && !isFirstLetter) {
         updateCurrentWord("add");
       } else if (!atEnd && !isSpace) {
-        setLetterIndex(letterIndex + 1);
         updateCaretPosition(letterRef.current, "add");
+        setLetterIndex(letterIndex + 1);
         checkLetter(pressedKey);
-      } else if (!isSpace) {
+      } else if (!isSpace && letters.length !== 20) {
+        updateCaretPosition(letterRef.current, "add");
         updateLetters(pressedKey, "add");
         updateLettersColor("wrong");
       }
@@ -137,8 +143,6 @@ const Word = forwardRef<HTMLDivElement, WordType>(
 
         setLetterIndex(letterIndex - 1);
       } else if (mode === "add") {
-        if (newLetters.length === 20) return;
-
         newLetters[letterIndex] = pressedKey;
 
         setLetterIndex(letterIndex + 1);
@@ -182,10 +186,15 @@ const Word = forwardRef<HTMLDivElement, WordType>(
         autoFocus={isFirstWord}
       >
         {letters.map((letter, i) => (
-          <span key={i} className={lettersColor[i]} ref={letterRef}>
+          <span
+            key={i}
+            className={lettersColor[i]}
+            ref={i === 0 ? letterRef : null}
+          >
             {letter}
           </span>
         ))}
+        {letterIndex}
       </div>
     );
   },
