@@ -8,6 +8,7 @@ type WordType = {
   wordIndex: number;
   currentWordIndex: number;
   updateCurrentWord: any;
+  updateCaretPosition: any;
   ref: React.RefObject<HTMLDivElement>;
 };
 type CaretType = { caretPosition: { top: number; left: number } };
@@ -29,6 +30,23 @@ export default function ToType() {
     }
   }
 
+  function updateCaretPosition(letterRef: HTMLSpanElement, mode: string) {
+    const letterWidth = Math.round(letterRef?.getBoundingClientRect().width);
+    const letterHeight = Math.round(letterRef?.getBoundingClientRect().height);
+
+    if (mode === "add") {
+      setCaretPosition({
+        ...caretPosition,
+        left: caretPosition.left + letterWidth,
+      });
+    } else if (mode === "minus") {
+      setCaretPosition({
+        ...caretPosition,
+        left: caretPosition.left - letterWidth,
+      });
+    }
+  }
+
   return (
     <div className="relative px-16 text-2xl">
       <Caret caretPosition={caretPosition} />
@@ -39,6 +57,7 @@ export default function ToType() {
           wordIndex={i}
           currentWordIndex={currentWordIndex}
           updateCurrentWord={updateCurrentWord}
+          updateCaretPosition={updateCaretPosition}
           ref={currentWordRef}
         />
       ))}
@@ -47,10 +66,21 @@ export default function ToType() {
 }
 
 const Word = forwardRef<HTMLDivElement, WordType>(
-  ({ word, wordIndex, currentWordIndex, updateCurrentWord }, ref) => {
+  (
+    {
+      word,
+      wordIndex,
+      currentWordIndex,
+      updateCurrentWord,
+      updateCaretPosition,
+    },
+    ref,
+  ) => {
     const [letterIndex, setLetterIndex] = useState(0);
     const [letters, setLetters] = useState(word.split(""));
     const [lettersColor, setLettersColor] = useState(Array<string>);
+
+    const letterRef = useRef<HTMLSpanElement>(null);
 
     function handleKeydown(e: KeyboardEvent) {
       const atEnd = letters.length === letterIndex;
@@ -70,13 +100,14 @@ const Word = forwardRef<HTMLDivElement, WordType>(
       if (pressedKey === "Backspace") {
         if (isFirstLetter && !isFirstWord) {
           updateCurrentWord("minus");
+        } else {
+          deleteLetter(pressedKey);
         }
-
-        deleteLetter(pressedKey);
       } else if (isSpace && !isFirstLetter) {
         updateCurrentWord("add");
       } else if (!atEnd && !isSpace) {
         setLetterIndex(letterIndex + 1);
+        updateCaretPosition(letterRef.current, "add");
         checkLetter(pressedKey);
       } else if (!isSpace) {
         updateLetters(pressedKey, "add");
@@ -151,7 +182,7 @@ const Word = forwardRef<HTMLDivElement, WordType>(
         autoFocus={isFirstWord}
       >
         {letters.map((letter, i) => (
-          <span key={i} className={lettersColor[i]}>
+          <span key={i} className={lettersColor[i]} ref={letterRef}>
             {letter}
           </span>
         ))}
