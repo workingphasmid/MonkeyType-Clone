@@ -8,15 +8,16 @@ type WordType = {
   wordIndex: number;
   currentWordIndex: number;
   updateCurrentWord: any;
-  updateCaretPosition: any;
+  setIsTyping: any;
+  isTyping: boolean;
   ref: React.RefObject<HTMLDivElement>;
 };
-type CaretType = { caretPosition: { top: number; left: number } };
 
 export default function ToType() {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+
   const currentWordRef = useRef<HTMLDivElement>(null);
-  const [caretPosition, setCaretPosition] = useState({ top: 0, left: 72 });
 
   useEffect(() => {
     currentWordRef.current?.focus();
@@ -30,30 +31,8 @@ export default function ToType() {
     }
   }
 
-  function updateCaretPosition(letterRef: HTMLSpanElement, mode: string) {
-    const letterWidth = Number(
-      letterRef?.getBoundingClientRect().width.toFixed(2),
-    );
-    const letterHeight = Number(
-      letterRef?.getBoundingClientRect().height.toFixed(2),
-    );
-
-    if (mode === "add") {
-      setCaretPosition({
-        ...caretPosition,
-        left: caretPosition.left + letterWidth,
-      });
-    } else if (mode === "minus") {
-      setCaretPosition({
-        ...caretPosition,
-        left: caretPosition.left - letterWidth,
-      });
-    }
-  }
-
   return (
-    <div className="relative px-16 text-2xl">
-      <Caret caretPosition={caretPosition} />
+    <div className="px-16 text-2xl">
       {words.map((word, i) => (
         <Word
           key={i}
@@ -61,7 +40,8 @@ export default function ToType() {
           wordIndex={i}
           currentWordIndex={currentWordIndex}
           updateCurrentWord={updateCurrentWord}
-          updateCaretPosition={updateCaretPosition}
+          setIsTyping={setIsTyping}
+          isTyping={isTyping}
           ref={currentWordRef}
         />
       ))}
@@ -70,21 +50,13 @@ export default function ToType() {
 }
 
 const Word = forwardRef<HTMLDivElement, WordType>(
-  (
-    {
-      word,
-      wordIndex,
-      currentWordIndex,
-      updateCurrentWord,
-      updateCaretPosition,
-    },
-    ref,
-  ) => {
+  ({ word, wordIndex, currentWordIndex, updateCurrentWord, setIsTyping, isTyping }, ref) => {
     const [letterIndex, setLetterIndex] = useState(0);
     const [letters, setLetters] = useState(word.split(""));
     const [lettersColor, setLettersColor] = useState(Array<string>);
 
     const letterRef = useRef<HTMLSpanElement>(null);
+    const letterWidth = letterRef.current?.getBoundingClientRect().width;
 
     function handleKeydown(e: KeyboardEvent) {
       const atEnd = letters.length === letterIndex;
@@ -96,6 +68,8 @@ const Word = forwardRef<HTMLDivElement, WordType>(
         return;
       }
 
+      setIsTyping(true);
+
       // Updating the word and letter indexes
       const isFirstLetter = letterIndex === 0;
       const isSpace = pressedKey === " ";
@@ -106,16 +80,13 @@ const Word = forwardRef<HTMLDivElement, WordType>(
           updateCurrentWord("minus");
         }
 
-        updateCaretPosition(letterRef.current, "minus");
         deleteLetter(pressedKey);
       } else if (isSpace && !isFirstLetter) {
         updateCurrentWord("add");
       } else if (!atEnd && !isSpace) {
-        updateCaretPosition(letterRef.current, "add");
         setLetterIndex(letterIndex + 1);
         checkLetter(pressedKey);
       } else if (!isSpace && letters.length !== 20) {
-        updateCaretPosition(letterRef.current, "add");
         updateLetters(pressedKey, "add");
         updateLettersColor("wrong");
       }
@@ -180,36 +151,41 @@ const Word = forwardRef<HTMLDivElement, WordType>(
     return (
       <div
         className="mx-2 inline-block"
+        style={isCurrentWord ? { position: "relative" } : undefined}
         onKeyDown={(e) => handleKeydown(e)}
         ref={currentWordIndex === wordIndex ? ref : null}
         tabIndex={isCurrentWord ? 0 : undefined}
         autoFocus={isFirstWord}
       >
+        {isCurrentWord && (
+          <Caret letterIndex={letterIndex} letterWidth={letterWidth} isTyping={isTyping} />
+        )}
         {letters.map((letter, i) => (
-          <span
-            key={i}
-            className={lettersColor[i]}
-            ref={i === 0 ? letterRef : null}
-          >
+          <span key={i} className={lettersColor[i]} ref={i === 0 ? letterRef : null}>
             {letter}
           </span>
         ))}
-        {letterIndex}
       </div>
     );
   },
 );
 
-function Caret({ caretPosition }: CaretType) {
-  const caretStyle = { top: "", left: "" };
-
-  caretStyle.top = caretPosition.top / 16 + "rem";
-  caretStyle.left = caretPosition.left / 16 + "rem";
+function Caret({
+  letterIndex,
+  letterWidth,
+  isTyping,
+}: {
+  letterIndex: number;
+  letterWidth: any;
+  isTyping: boolean;
+}) {
+  const leftPosition = Math.round(letterIndex * letterWidth);
+  const animationName = isTyping ? "none" : "";
 
   return (
     <div
-      className="absolute h-8 w-[.1em] animate-pulse bg-caret-color transition-all duration-75"
-      style={caretStyle}
+      className="absolute h-8 w-[2.2px] animate-pulse bg-caret-color transition-all duration-75"
+      style={{ left: leftPosition, animationName: animationName }}
     ></div>
   );
 }
