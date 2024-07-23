@@ -104,6 +104,8 @@ const Word = forwardRef<HTMLDivElement, WordType>(
 
         setLetterIndex(letterIndex - 1);
       } else if (mode === "add") {
+        if (newLetters.length === 20) return;
+
         newLetters[letterIndex] = pressedKey;
 
         setLetterIndex(letterIndex + 1);
