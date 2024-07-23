@@ -10,10 +10,16 @@ type WordType = {
   updateCurrentWord: any;
   ref: React.RefObject<HTMLDivElement>;
 };
+type CaretType = { caretPosition: { top: number; left: number } };
 
 export default function ToType() {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const currentWordRef = useRef<HTMLDivElement>(null);
+  const [caretPosition, setCaretPosition] = useState({ top: 0, left: 72 });
+
+  useEffect(() => {
+    currentWordRef.current?.focus();
+  }, [currentWordIndex]);
 
   function updateCurrentWord(mode: string) {
     if (mode === "add") {
@@ -23,13 +29,9 @@ export default function ToType() {
     }
   }
 
-  useEffect(() => {
-    currentWordRef.current?.focus();
-  }, [currentWordIndex]);
-
   return (
     <div className="relative px-16 text-2xl">
-      <Caret />
+      <Caret caretPosition={caretPosition} />
       {words.map((word, i) => (
         <Word
           key={i}
@@ -158,8 +160,16 @@ const Word = forwardRef<HTMLDivElement, WordType>(
   },
 );
 
-function Caret() {
+function Caret({ caretPosition }: CaretType) {
+  const caretStyle = { top: "", left: "" };
+
+  caretStyle.top = caretPosition.top / 16 + "rem";
+  caretStyle.left = caretPosition.left / 16 + "rem";
+
   return (
-    <div className="absolute left-0 top-0 h-8 w-[.1em] bg-caret-color transition-all duration-75"></div>
+    <div
+      className="absolute h-8 w-[.1em] animate-pulse bg-caret-color transition-all duration-75"
+      style={caretStyle}
+    ></div>
   );
 }
