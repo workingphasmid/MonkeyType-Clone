@@ -138,14 +138,15 @@ const Word = forwardRef<HTMLDivElement, WordType>(
       }
     }
 
-    const isAutoFocus = wordIndex === 0;
+    const isCurrentWord = wordIndex === currentWordIndex;
+    const isFirstWord = wordIndex === 0;
     return (
       <div
         className="mx-2 inline-block"
         onKeyDown={(e) => handleKeydown(e)}
         ref={currentWordIndex === wordIndex ? ref : null}
-        tabIndex={0}
-        autoFocus={isAutoFocus}
+        tabIndex={isCurrentWord ? 0 : undefined}
+        autoFocus={isFirstWord}
       >
         {letters.map((letter, i) => (
           <span key={i} className={lettersColor[i]}>
