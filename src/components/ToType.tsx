@@ -113,8 +113,11 @@ const Word = forwardRef<HTMLDivElement, WordType>(
 
         deleteLetter(pressedKey);
       } else if (isSpace && !isFirstLetter) {
+        if (letterIndex !== letters.length) {
+          handleWordsStyle(isCurrentWord);
+        }
+
         updateCurrentWord("add");
-        handleWordsStyle(isCurrentWord);
       } else if (!atEnd && !isSpace) {
         setLetterIndex(letterIndex + 1);
         checkLetter(pressedKey);
@@ -179,11 +182,17 @@ const Word = forwardRef<HTMLDivElement, WordType>(
 
     const isCurrentWord = wordIndex === currentWordIndex;
     const isFirstWord = wordIndex === 0;
+    const newWordsStyle = [...wordsStyle];
+    if (isCurrentWord) {
+      newWordsStyle[currentWordIndex] = {
+        position: "relative",
+      };
+    }
 
     return (
       <div
-        className="mx-2 inline-block"
-        style={{ ...wordsStyle[wordIndex] }}
+        className="mx-2 inline-block decoration-error-color underline-offset-4"
+        style={newWordsStyle[wordIndex]}
         onKeyDown={(e) => handleKeydown(e)}
         ref={currentWordIndex === wordIndex ? ref : null}
         tabIndex={isCurrentWord ? 0 : undefined}
