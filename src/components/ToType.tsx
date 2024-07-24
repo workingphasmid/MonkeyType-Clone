@@ -111,7 +111,11 @@ const Word = forwardRef<HTMLDivElement, WordType>(
 
         deleteLetter(pressedKey);
       } else if (isSpace && !isFirstLetter) {
-        if (letterIndex !== letters.length) {
+        const newWord = letters.slice(0, letterIndex).join("");
+        console.log(newWord);
+        console.log(word);
+
+        if (word !== newWord) {
           handleWordsStyle();
         }
 
