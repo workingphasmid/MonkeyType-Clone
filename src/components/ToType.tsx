@@ -197,7 +197,7 @@ const Word = forwardRef<HTMLDivElement, WordType>(
 
     return (
       <div
-        className="mx-2 inline-block decoration-error-color underline-offset-4"
+        className="mx-2 inline-block decoration-error-color underline-offset-4 outline-none"
         style={newWordsStyle[wordIndex]}
         onKeyDown={(e) => handleKeydown(e)}
         ref={currentWordIndex === wordIndex ? ref : null}
