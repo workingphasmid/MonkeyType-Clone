@@ -10,12 +10,15 @@ type WordType = {
   updateCurrentWord: any;
   setIsTyping: any;
   isTyping: boolean;
+  wordsStyle: Array<{}>;
+  handleWordsStyle: any;
   ref: React.RefObject<HTMLDivElement>;
 };
 
 export default function ToType() {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
+  const [wordsStyle, setWordsStyle] = useState<any>([{ position: "relative" }]);
 
   const currentWordRef = useRef<HTMLDivElement>(null);
 
@@ -31,6 +34,20 @@ export default function ToType() {
     }
   }
 
+  function handleWordsStyle(isCurrentWord: boolean) {
+    if (isCurrentWord) {
+      const newWordsStyle = [...wordsStyle];
+      newWordsStyle[currentWordIndex] = {
+        textDecorationLine: "underline",
+      };
+      newWordsStyle[currentWordIndex + 1] = {
+        position: "relative",
+      };
+
+      setWordsStyle(newWordsStyle);
+    }
+  }
+
   return (
     <div className="px-16 text-2xl">
       {words.map((word, i) => (
@@ -42,6 +59,8 @@ export default function ToType() {
           updateCurrentWord={updateCurrentWord}
           setIsTyping={setIsTyping}
           isTyping={isTyping}
+          handleWordsStyle={handleWordsStyle}
+          wordsStyle={wordsStyle}
           ref={currentWordRef}
         />
       ))}
@@ -50,7 +69,19 @@ export default function ToType() {
 }
 
 const Word = forwardRef<HTMLDivElement, WordType>(
-  ({ word, wordIndex, currentWordIndex, updateCurrentWord, setIsTyping, isTyping }, ref) => {
+  (
+    {
+      word,
+      wordIndex,
+      currentWordIndex,
+      updateCurrentWord,
+      setIsTyping,
+      isTyping,
+      handleWordsStyle,
+      wordsStyle,
+    },
+    ref,
+  ) => {
     const [letterIndex, setLetterIndex] = useState(0);
     const [letters, setLetters] = useState(word.split(""));
     const [lettersColor, setLettersColor] = useState(Array<string>);
@@ -83,6 +114,7 @@ const Word = forwardRef<HTMLDivElement, WordType>(
         deleteLetter(pressedKey);
       } else if (isSpace && !isFirstLetter) {
         updateCurrentWord("add");
+        handleWordsStyle(isCurrentWord);
       } else if (!atEnd && !isSpace) {
         setLetterIndex(letterIndex + 1);
         checkLetter(pressedKey);
@@ -100,10 +132,7 @@ const Word = forwardRef<HTMLDivElement, WordType>(
         setLetterIndex(letterIndex - 1);
       }
 
-      const newLettersColor = [...lettersColor];
-      newLettersColor.pop();
-
-      setLettersColor(newLettersColor);
+      updateLettersColor("delete");
     }
 
     function updateLetters(pressedKey: string, mode: string) {
@@ -131,6 +160,8 @@ const Word = forwardRef<HTMLDivElement, WordType>(
         newLettersColor[letterIndex] = "text-error-color";
       } else if (mode === "default") {
         newLettersColor[letterIndex] = "text-sub-color";
+      } else if (mode === "delete") {
+        newLettersColor.pop();
       }
 
       setLettersColor(newLettersColor);
@@ -148,20 +179,29 @@ const Word = forwardRef<HTMLDivElement, WordType>(
 
     const isCurrentWord = wordIndex === currentWordIndex;
     const isFirstWord = wordIndex === 0;
+
     return (
       <div
         className="mx-2 inline-block"
-        style={isCurrentWord ? { position: "relative" } : undefined}
+        style={{ ...wordsStyle[wordIndex] }}
         onKeyDown={(e) => handleKeydown(e)}
         ref={currentWordIndex === wordIndex ? ref : null}
         tabIndex={isCurrentWord ? 0 : undefined}
         autoFocus={isFirstWord}
       >
         {isCurrentWord && (
-          <Caret letterIndex={letterIndex} letterWidth={letterWidth} isTyping={isTyping} />
+          <Caret
+            letterIndex={letterIndex}
+            letterWidth={letterWidth}
+            isTyping={isTyping}
+          />
         )}
         {letters.map((letter, i) => (
-          <span key={i} className={lettersColor[i]} ref={i === 0 ? letterRef : null}>
+          <span
+            key={i}
+            className={lettersColor[i]}
+            ref={i === 0 ? letterRef : null}
+          >
             {letter}
           </span>
         ))}
@@ -179,7 +219,7 @@ function Caret({
   letterWidth: any;
   isTyping: boolean;
 }) {
-  const leftPosition = Math.round(letterIndex * letterWidth);
+  const leftPosition = letterWidth ? Math.round(letterIndex * letterWidth) : 0;
   const animationName = isTyping ? "none" : "";
 
   return (
