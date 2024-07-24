@@ -34,14 +34,18 @@ export default function ToType() {
     }
   }
 
-  function handleWordsStyle() {
+  function handleWordsStyle(mode: string) {
     const newWordsStyle = [...wordsStyle];
-    newWordsStyle[currentWordIndex] = {
-      textDecorationLine: "underline",
-    };
-    newWordsStyle[currentWordIndex + 1] = {
-      position: "relative",
-    };
+
+    if (mode === "add") {
+      newWordsStyle[currentWordIndex] = {
+        textDecorationLine: "underline",
+      };
+    } else if (mode === "remove") {
+      newWordsStyle[currentWordIndex] = {
+        textDecorationLine: "",
+      };
+    }
 
     setWordsStyle(newWordsStyle);
   }
@@ -103,20 +107,20 @@ const Word = forwardRef<HTMLDivElement, WordType>(
       const isFirstLetter = letterIndex === 0;
       const isSpace = pressedKey === " ";
       const isFirstWord = wordIndex === 0;
+      const newWord = letters.slice(0, letterIndex).join("");
 
       if (pressedKey === "Backspace") {
         if (isFirstLetter && !isFirstWord) {
           updateCurrentWord("minus");
+          handleWordsStyle("remove");
         }
 
         deleteLetter(pressedKey);
       } else if (isSpace && !isFirstLetter) {
-        const newWord = letters.slice(0, letterIndex).join("");
-        console.log(newWord);
-        console.log(word);
-
-        if (word !== newWord) {
-          handleWordsStyle();
+        if (word !== newWord || lettersColor.includes("text-error-color")) {
+          handleWordsStyle("add");
+        } else {
+          handleWordsStyle("remove");
         }
 
         updateCurrentWord("add");
