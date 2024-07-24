@@ -34,18 +34,16 @@ export default function ToType() {
     }
   }
 
-  function handleWordsStyle(isCurrentWord: boolean) {
-    if (isCurrentWord) {
-      const newWordsStyle = [...wordsStyle];
-      newWordsStyle[currentWordIndex] = {
-        textDecorationLine: "underline",
-      };
-      newWordsStyle[currentWordIndex + 1] = {
-        position: "relative",
-      };
+  function handleWordsStyle() {
+    const newWordsStyle = [...wordsStyle];
+    newWordsStyle[currentWordIndex] = {
+      textDecorationLine: "underline",
+    };
+    newWordsStyle[currentWordIndex + 1] = {
+      position: "relative",
+    };
 
-      setWordsStyle(newWordsStyle);
-    }
+    setWordsStyle(newWordsStyle);
   }
 
   return (
@@ -114,7 +112,7 @@ const Word = forwardRef<HTMLDivElement, WordType>(
         deleteLetter(pressedKey);
       } else if (isSpace && !isFirstLetter) {
         if (letterIndex !== letters.length) {
-          handleWordsStyle(isCurrentWord);
+          handleWordsStyle();
         }
 
         updateCurrentWord("add");
